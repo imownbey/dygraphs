@@ -4636,6 +4636,7 @@ this.datasets=new Array();
 };
 DateGraphLayout.prototype.updateOptions=function(_9){
 MochiKit.Base.update(this.options,_9?_9:{});
+console.log(this.options.shouldFill);
 };
 DateGraphCanvasRenderer=function(_10,_11,_12){
 PlotKit.CanvasRenderer.call(this,_10,_11,_12);
@@ -4648,6 +4649,7 @@ this.options.drawBackground=false;
 };
 DateGraphCanvasRenderer.prototype=new PlotKit.CanvasRenderer();
 DateGraphCanvasRenderer.prototype.render=function(){
+console.log("Rendertime: "+this.options.shouldFill);
 var ctx=this.element.getContext("2d");
 if(this.options.drawYGrid){
 var _14=this.layout.yticks;
@@ -4683,6 +4685,7 @@ this._renderLineChart();
 this._renderLineAxis();
 };
 DateGraphCanvasRenderer.prototype._renderLineChart=function(){
+console.log("Rendering again");
 var _17=this.element.getContext("2d");
 var _18=this.options.colorScheme.length;
 var _19=this.options.colorScheme;
@@ -4724,7 +4727,8 @@ MochiKit.Iter.forEach(this.layout.points,_24(_34,ctx),this);
 ctx.lineTo(this.area.x+this.area.w,this.area.y+this.area.h);
 ctx.closePath();
 ctx.stroke();
-if(this.options.shouldFill){
+console.log(this.options);
+if(this.layout.options.shouldFill){
 ctx.fillStyle=_19[i%_18].toRGBString();
 ctx.fill();
 }
@@ -4802,7 +4806,6 @@ this.width_=parseInt(div.style.width,10);
 this.height_=parseInt(div.style.height,10);
 this.errorBars_=_55.errorBars||false;
 this.stackedGraph_=_55.stackedGraph||false;
-this.shouldFill_=_55.shouldFill||this.stackedGraph_;
 this.fractions_=_55.fractions||false;
 this.strokeWidth_=_55.strokeWidth||DateGraph.DEFAULT_STROKE_WIDTH;
 this.dateWindow_=_55.dateWindow||null;
@@ -4817,6 +4820,7 @@ this.sigma_=_55.sigma||2;
 this.wilsonInterval_=_55.wilsonInterval||true;
 this.customBars_=_55.customBars||false;
 this.attrs_={};
+_55.shouldFill=_55.shouldFill||this.stackedGraph_;
 MochiKit.Base.update(this.attrs_,DateGraph.DEFAULT_ATTRS);
 MochiKit.Base.update(this.attrs_,_55);
 if(typeof this.attrs_.pixelsPerXLabel=="undefined"){
@@ -4829,7 +4833,7 @@ this.labels_=[];
 this.clickCallback_=_55.clickCallback||null;
 this.zoomCallback_=_55.zoomCallback||null;
 this.createInterface_();
-this.layoutOptions_={"errorBars":(this.errorBars_||this.customBars_),"shouldFill":this.shouldFill_,"stackedGraph":this.stackedGraph_,"xOriginIsZero":false,"yTickPrecision":5};
+this.layoutOptions_={"errorBars":(this.errorBars_||this.customBars_),"stackedGraph":this.stackedGraph_,"xOriginIsZero":false,"yTickPrecision":5};
 MochiKit.Base.update(this.layoutOptions_,_55);
 this.setColors_(_55);
 this.layout_=new DateGraphLayout(this.layoutOptions_);
@@ -5347,7 +5351,7 @@ vals[j]=[_172[j][0],(y)];
 if(maxY==null||y>maxY){
 maxY=y;
 }
-sums[_172[j][0]]=sums[_172[j][0]]+vals[j][1];
+sums[_172[j][0]]=sums[_172[j][0]]+_172[j][1];
 }
 _171.push([this.labels_[i-1],vals]);
 }else{
@@ -5356,6 +5360,7 @@ this.layout_.addDataset(this.labels_[i-1],_172);
 }
 }
 if(_171.length!=0){
+this.renderOptions_.colorScheme.reverse();
 for(var i=(_171.length-1);i>=0;i--){
 this.layout_.addDataset(_171[i][0],_171[i][1]);
 }
@@ -5608,12 +5613,9 @@ DateGraph.prototype.updateOptions=function(_210){
 if(_210.errorBars){
 this.errorBars_=_210.errorBars;
 }
-if(_210.stackedGraph){
-this.stackedGraph_=_210.stackedGraph;
-if(this.stackedGraph_){
+var _211=this.stackedGraph_;
+this.stackedGraph_=_210.stackedGraph||false;
 this.shouldFill_=(this.stackedGraph_||false);
-}
-}
 if(_210.customBars){
 this.customBars_=_210.customBars;
 }
@@ -5634,7 +5636,10 @@ if(typeof (_210.labels)!="undefined"){
 this.labels_=_210.labels;
 this.labelsFromCSV_=(_210.labels==null);
 }
-this.layout_.updateOptions({"errorBars":this.errorBars_});
+this.layout_.updateOptions({"errorBars":this.errorBars_,"shouldFill":this.shouldFill_});
+if(_211&&!this.stackedGraph_){
+this.renderOptions_.colorScheme.reverse();
+}
 if(_210["file"]&&_210["file"]!=this.file_){
 this.file_=_210["file"];
 this.start_();
@@ -5642,15 +5647,15 @@ this.start_();
 this.drawGraph_(this.rawData_);
 }
 };
-DateGraph.prototype.adjustRoll=function(_211){
-this.rollPeriod_=_211;
+DateGraph.prototype.adjustRoll=function(_212){
+this.rollPeriod_=_212;
 this.drawGraph_(this.rawData_);
 };
-DateGraph.GVizChart=function(_212){
-this.container=_212;
+DateGraph.GVizChart=function(_213){
+this.container=_213;
 };
-DateGraph.GVizChart.prototype.draw=function(data,_213){
+DateGraph.GVizChart.prototype.draw=function(data,_214){
 this.container.innerHTML="";
-this.date_graph=new DateGraph(this.container,data,null,_213||{});
+this.date_graph=new DateGraph(this.container,data,null,_214||{});
 };
 

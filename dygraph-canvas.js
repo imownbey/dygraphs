@@ -63,6 +63,7 @@ DateGraphLayout.prototype.removeAllDatasets = function() {
  */
 DateGraphLayout.prototype.updateOptions = function(new_options) {
   MochiKit.Base.update(this.options, new_options ? new_options : {});
+  console.log(this.options.shouldFill);
 };
 
 // Subclass PlotKit.CanvasRenderer to add:
@@ -92,6 +93,7 @@ DateGraphCanvasRenderer.prototype = new PlotKit.CanvasRenderer();
  * Draw an X/Y grid on top of the existing plot
  */
 DateGraphCanvasRenderer.prototype.render = function() {
+  console.log("Rendertime: " + this.options.shouldFill);
   // Draw the new X/Y grid
   var ctx = this.element.getContext("2d");
   if (this.options.drawYGrid) {
@@ -136,6 +138,7 @@ DateGraphCanvasRenderer.prototype.render = function() {
  * Overrides the CanvasRenderer method to draw error bars
  */
 DateGraphCanvasRenderer.prototype._renderLineChart = function() {
+  console.log("Rendering again")
   var context = this.element.getContext("2d");
   var colorCount = this.options.colorScheme.length;
   var colorScheme = this.options.colorScheme;
@@ -182,7 +185,8 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
       ctx.lineTo(this.area.x + this.area.w, this.area.y + this.area.h);
       ctx.closePath();
       ctx.stroke();
-      if(this.options.shouldFill) {
+      console.log(this.options);
+      if(this.layout.options.shouldFill) {
         ctx.fillStyle = colorScheme[i%colorCount].toRGBString();
         ctx.fill();
       }

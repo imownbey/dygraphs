@@ -107,7 +107,6 @@ DateGraph.prototype.__init__ = function(div, file, labels, attrs) {
   this.height_ = parseInt(div.style.height, 10);
   this.errorBars_ = attrs.errorBars || false;
   this.stackedGraph_ = attrs.stackedGraph || false;
-  this.shouldFill_ = attrs.shouldFill || this.stackedGraph_;
   this.fractions_ = attrs.fractions || false;
   this.strokeWidth_ = attrs.strokeWidth || DateGraph.DEFAULT_STROKE_WIDTH;
   this.dateWindow_ = attrs.dateWindow || null;
@@ -124,6 +123,9 @@ DateGraph.prototype.__init__ = function(div, file, labels, attrs) {
   this.customBars_ = attrs.customBars || false;
 
   this.attrs_ = {};
+
+  attrs.shouldFill = attrs.shouldFill || this.stackedGraph_;
+
   MochiKit.Base.update(this.attrs_, DateGraph.DEFAULT_ATTRS);
   MochiKit.Base.update(this.attrs_, attrs);
 
@@ -147,7 +149,6 @@ DateGraph.prototype.__init__ = function(div, file, labels, attrs) {
 
   // Create the PlotKit grapher
   this.layoutOptions_ = { 'errorBars': (this.errorBars_ || this.customBars_),
-                          'shouldFill': this.shouldFill_,
                           'stackedGraph': this.stackedGraph_,
                           'xOriginIsZero': false,
                           'yTickPrecision': 5 };
@@ -903,7 +904,7 @@ DateGraph.prototype.drawGraph_ = function(data) {
           y = series[j][1] + sums[series[j][0]];
           vals[j] = [series[j][0], (y)];
           if (maxY == null || y > maxY) maxY = y;
-          sums[series[j][0]] = sums[series[j][0]] + vals[j][1];
+          sums[series[j][0]] = sums[series[j][0]] + series[j][1];
         }
 
         datasets.push([this.labels_[i - 1], vals]);
@@ -913,6 +914,7 @@ DateGraph.prototype.drawGraph_ = function(data) {
     }
   }
   if (datasets.length != 0) {
+    this.renderOptions_.colorScheme.reverse();
     for (var i = (datasets.length - 1); i >= 0; i--) {
       this.layout_.addDataset(datasets[i][0], datasets[i][1]);
     }
@@ -1253,11 +1255,12 @@ DateGraph.prototype.updateOptions = function(attrs) {
   if (attrs.errorBars) {
     this.errorBars_ = attrs.errorBars;
   }
-  if (attrs.stackedGraph) {
-    this.stackedGraph_ = attrs.stackedGraph;
-    if (this.stackedGraph_)
-      this.shouldFill_ = (this.stackedGraph_ || false);
-  }
+ 
+  var old_stacked = this.stackedGraph_;
+
+  this.stackedGraph_ = attrs.stackedGraph || false;
+  this.shouldFill_ = (this.stackedGraph_ || false);
+
   if (attrs.customBars) {
     this.customBars_ = attrs.customBars;
   }
@@ -1278,7 +1281,11 @@ DateGraph.prototype.updateOptions = function(attrs) {
     this.labels_ = attrs.labels;
     this.labelsFromCSV_ = (attrs.labels == null);
   }
-  this.layout_.updateOptions({ 'errorBars': this.errorBars_ });
+  this.layout_.updateOptions({ 'errorBars': this.errorBars_, 'shouldFill': this.shouldFill_ });
+  // Reverse colors if we used to stack but dont anymore
+  if (old_stacked && !this.stackedGraph_) {
+    this.renderOptions_.colorScheme.reverse();
+  }
   if (attrs['file'] && attrs['file'] != this.file_) {
     this.file_ = attrs['file'];
     this.start_();

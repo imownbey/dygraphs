@@ -626,7 +626,8 @@ DateGraph.prototype.round_ = function(num, places) {
  * @private
  */
 DateGraph.prototype.loadedEvent_ = function(data) {
-  jQuery(document).trigger('graph.loaded');
+  if (typeof(jQuery) != "undefined")
+    jQuery(document).trigger('graph.loaded');
   this.rawData_ = this.parseCSV_(data);
   this.drawGraph_(this.rawData_);
 };

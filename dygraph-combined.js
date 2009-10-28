@@ -4709,10 +4709,14 @@ _17.save();
 _17.strokeStyle=_30.toRGBString();
 _17.lineWidth=this.options.strokeWidth;
 ctx.beginPath();
-ctx.moveTo(_27.area.x,_27.area.h+_27.area.y);
 var _32=this.layout.points[0];
-var _33=false;
-some_x=this.layout.points[1].canvasx;
+var _33;
+if(this.layout.options.shouldFill){
+_33=false;
+ctx.moveTo(_27.area.x,_27.area.h+_27.area.y);
+}else{
+_33=true;
+}
 var _34=function(_35,_32){
 if(_32.name==_29){
 if(_33){
@@ -4724,8 +4728,10 @@ _33=false;
 }
 };
 MochiKit.Iter.forEach(this.layout.points,_24(_34,ctx),this);
+if(this.layout.options.shouldFill){
 ctx.lineTo(this.area.x+this.area.w,this.area.y+this.area.h);
 ctx.closePath();
+}
 ctx.stroke();
 console.log(this.options);
 if(this.layout.options.shouldFill){

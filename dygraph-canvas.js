@@ -168,10 +168,15 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
       context.strokeStyle = color.toRGBString();
       context.lineWidth = this.options.strokeWidth;
       ctx.beginPath();
-      ctx.moveTo(graph.area.x, graph.area.h + graph.area.y);
       var point = this.layout.points[0];
-      var first_point = false;
-      some_x = this.layout.points[1].canvasx
+
+      var first_point;
+      if (this.layout.options.shouldFill) {
+        first_point = false;
+        ctx.moveTo(graph.area.x, graph.area.h + graph.area.y);
+      } else {
+        first_point = true;
+      }
       var addPoint = function(ctx_, point) {
         if (point.name == setName) {
           if (first_point)
@@ -182,8 +187,10 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
         }
       };
       MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
-      ctx.lineTo(this.area.x + this.area.w, this.area.y + this.area.h);
-      ctx.closePath();
+      if (this.layout.options.shouldFill) {
+        ctx.lineTo(this.area.x + this.area.w, this.area.y + this.area.h);
+        ctx.closePath();
+      }
       ctx.stroke();
       console.log(this.options);
       if(this.layout.options.shouldFill) {

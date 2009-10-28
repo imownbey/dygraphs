@@ -121,6 +121,7 @@ DateGraph.prototype.__init__ = function(div, file, labels, attrs) {
   this.sigma_ = attrs.sigma || 2.0;
   this.wilsonInterval_ = attrs.wilsonInterval || true;
   this.customBars_ = attrs.customBars || false;
+  this.colorsChanged_ = false;
 
   this.attrs_ = {};
 
@@ -914,7 +915,10 @@ DateGraph.prototype.drawGraph_ = function(data) {
     }
   }
   if (datasets.length != 0) {
-    this.renderOptions_.colorScheme.reverse();
+    if(!this.colorsChanged_) {
+      this.renderOptions_.colorScheme.reverse();
+      this.colorsChanged_ = true;
+    }
     for (var i = (datasets.length - 1); i >= 0; i--) {
       this.layout_.addDataset(datasets[i][0], datasets[i][1]);
     }
@@ -1285,6 +1289,7 @@ DateGraph.prototype.updateOptions = function(attrs) {
   // Reverse colors if we used to stack but dont anymore
   if (old_stacked && !this.stackedGraph_) {
     this.renderOptions_.colorScheme.reverse();
+    this.colorsChanged_ = false;
   }
   if (attrs['file'] && attrs['file'] != this.file_) {
     this.file_ = attrs['file'];

@@ -4825,6 +4825,7 @@ this.xTicker_=_55.xTicker||DateGraph.prototype.dateTicker;
 this.sigma_=_55.sigma||2;
 this.wilsonInterval_=_55.wilsonInterval||true;
 this.customBars_=_55.customBars||false;
+this.colorsChanged_=false;
 this.attrs_={};
 _55.shouldFill=_55.shouldFill||this.stackedGraph_;
 MochiKit.Base.update(this.attrs_,DateGraph.DEFAULT_ATTRS);
@@ -5366,7 +5367,10 @@ this.layout_.addDataset(this.labels_[i-1],_172);
 }
 }
 if(_171.length!=0){
+if(!this.colorsChanged_){
 this.renderOptions_.colorScheme.reverse();
+this.colorsChanged_=true;
+}
 for(var i=(_171.length-1);i>=0;i--){
 this.layout_.addDataset(_171[i][0],_171[i][1]);
 }
@@ -5645,6 +5649,7 @@ this.labelsFromCSV_=(_210.labels==null);
 this.layout_.updateOptions({"errorBars":this.errorBars_,"shouldFill":this.shouldFill_});
 if(_211&&!this.stackedGraph_){
 this.renderOptions_.colorScheme.reverse();
+this.colorsChanged_=false;
 }
 if(_210["file"]&&_210["file"]!=this.file_){
 this.file_=_210["file"];

@@ -155,7 +155,6 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
   }
 
   MochiKit.Iter.forEach(this.layout.points, updatePoint, this);
-  var graph = this;
   // create paths
   var makePath = function(ctx) {
     for (var i = 0; i < setCount; i++) {
@@ -173,7 +172,7 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
       var first_point;
       if (this.layout.options.shouldFill) {
         first_point = false;
-        ctx.moveTo(graph.area.x, graph.area.h + graph.area.y);
+        ctx.moveTo(this.area.x, this.area.h + this.area.y);
       } else {
         first_point = true;
       }

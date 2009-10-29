@@ -4609,7 +4609,7 @@ PlotKit.Layout.call(this,"line",_1);
 DateGraphLayout.prototype=new PlotKit.Layout();
 DateGraphLayout.prototype.evaluateWithError=function(){
 this.evaluate();
-if(!this.options.errorBars){
+if(!this.options.dataHasErrorBars){
 return;
 }
 var i=0;
@@ -4765,14 +4765,16 @@ _40[1]=_46[1];
 _39=_45.canvasx;
 }
 };
+if(_21){
 var _47=_37.colorWithAlpha(0.15);
 ctx.fillStyle=_47.toRGBString();
 ctx.beginPath();
 MochiKit.Iter.forEach(this.layout.points,_24(_43,ctx),this);
 ctx.fill();
 }
+}
 };
-if(_21){
+if(this.layout.options.dataHasErrorBars){
 _23(_35,this)(_17);
 }
 _23(_27,this)(_17);
@@ -4806,6 +4808,7 @@ this.previousVerticalX_=-1;
 this.width_=parseInt(div.style.width,10);
 this.height_=parseInt(div.style.height,10);
 this.errorBars_=_54.errorBars||false;
+this.dataHasErrorBars_=_54.dataHasErrorBars||this.errorBars_;
 this.stackedGraph_=_54.stackedGraph||false;
 this.fractions_=_54.fractions||false;
 this.strokeWidth_=_54.strokeWidth||DateGraph.DEFAULT_STROKE_WIDTH;
@@ -4835,7 +4838,7 @@ this.labels_=[];
 this.clickCallback_=_54.clickCallback||null;
 this.zoomCallback_=_54.zoomCallback||null;
 this.createInterface_();
-this.layoutOptions_={"errorBars":(this.errorBars_||this.customBars_),"stackedGraph":this.stackedGraph_,"xOriginIsZero":false,"yTickPrecision":5};
+this.layoutOptions_={"errorBars":(this.errorBars_||this.customBars_),"dataHasErrorBars":this.dataHasErrorBars_,"stackedGraph":this.stackedGraph_,"xOriginIsZero":false,"yTickPrecision":5};
 MochiKit.Base.update(this.layoutOptions_,_54);
 this.setColors_(_54);
 this.layout_=new DateGraphLayout(this.layoutOptions_);
@@ -5314,7 +5317,7 @@ var date=data[j][0];
 _171[j]=[date,data[j][i]];
 }
 _171=this.rollingAverage(_171,this.rollPeriod_);
-var bars=this.errorBars_||this.customBars_;
+var bars=this.dataHasErrorBars_;
 if(this.dateWindow_){
 var low=this.dateWindow_[0];
 var high=this.dateWindow_[1];
@@ -5337,30 +5340,38 @@ maxY=bars?y+_171[j][1][1]:y;
 }
 }
 }
+if(bars||this.stackedGraph_){
+var vals=[];
+for(var j=0;j<_171.length;j++){
+var y;
 if(bars){
-var vals=[];
-for(var j=0;j<_171.length;j++){
-vals[j]=[_171[j][0],_171[j][1][0],_171[j][1][1],_171[j][1][2]];
-}
-this.layout_.addDataset(this.labels_[i-1],vals);
+y=_171[j][1][0];
 }else{
+y=_171[j][1];
+}
 if(this.stackedGraph_){
-var vals=[];
-for(var j=0;j<_171.length;j++){
 if(sums[_171[j][0]]===undefined){
 sums[_171[j][0]]=0;
 }
-y=_171[j][1]+sums[_171[j][0]];
-vals[j]=[_171[j][0],(y)];
+y+=sums[_171[j][0]];
 if(maxY==null||y>maxY){
 maxY=y;
 }
-sums[_171[j][0]]=sums[_171[j][0]]+_171[j][1];
+sums[_171[j][0]]+=y;
 }
+if(bars){
+vals[j]=[_171[j][0],y,_171[j][1][1],_171[j][1][2]];
+}else{
+vals[j]=[_171[j][0],y];
+}
+}
+if(this.stackedGraph_){
 _170.push([this.labels_[i-1],vals]);
 }else{
-this.layout_.addDataset(this.labels_[i-1],_171);
+this.layout_.addDataset(this.labels_[i-1],vals);
 }
+}else{
+this.layout_.addDataset(this.labels_[i-1],_171);
 }
 }
 if(_170.length!=0){
@@ -5452,7 +5463,7 @@ _179[i]=[_177[i][0],[1*mid/_189,1*(mid-low)/_189,1*(high-mid)/_189]];
 }
 }else{
 var _191=Math.min(_178-1,_177.length-2);
-if(!this.errorBars_){
+if(!this.dataHasErrorBars_){
 for(var i=0;i<_191;i++){
 var sum=0;
 for(var j=0;j<i+1;j++){
@@ -5540,7 +5551,7 @@ var vals=_200[j].split("/");
 _201[j]=[parseFloat(vals[0]),parseFloat(vals[1])];
 }
 }else{
-if(this.errorBars_){
+if(this.dataHasErrorBars_){
 for(var j=1;j<_200.length;j+=2){
 _201[(j+1)/2]=[parseFloat(_200[j]),parseFloat(_200[j+1])];
 }
@@ -5617,9 +5628,7 @@ req.send(null);
 }
 };
 DateGraph.prototype.updateOptions=function(_209){
-if(_209.errorBars){
-this.errorBars_=_209.errorBars;
-}
+this.errorBars_=_209.errorBars||false;
 var _210=this.stackedGraph_;
 this.stackedGraph_=_209.stackedGraph||false;
 this.shouldFill_=(this.stackedGraph_||false);

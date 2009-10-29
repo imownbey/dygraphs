@@ -6,6 +6,7 @@
     <![endif]-->
     <script type="text/javascript" src="../dygraph-combined.js"></script>
     <script type="text/javascript" src="../dygraph.js"></script>
+    <script type="text/javascript" src="../dygraph-canvas.js"></script>
     <script type="text/javascript" src="data.js"></script>
   </head>
   <body>
@@ -13,6 +14,10 @@
     <div id="g" style="width:600px; height:300px;"></div>
     <p>14-Day Rollup:</p>
     <div id="g30" style="width:600px; height:300px;"></div>
+    <p>14-day rollup with errorbars turned off:</p>
+    <div id="g-no" style="width:600px; height:300px;"></div>
+    <p>14-day rollup with errorbars turned off stacked:</p>
+    <div id="g-stacked" style="width:600px; height:300px;"></div>
 
     <script type="text/javascript">
       g = new DateGraph(
@@ -27,6 +32,23 @@
             NoisyData, null, {
               rollPeriod: 14,
               errorBars: true
+            }
+          );
+      gno = new DateGraph(
+            document.getElementById("g-no"),
+            NoisyData, null, {
+              rollPeriod: 14,
+              errorBars: false,
+              dataHasErrorBars: true
+            }
+          );
+      gstacked = new DateGraph(
+            document.getElementById("g-stacked"),
+            NoisyData, null, {
+              rollPeriod: 14,
+              errorBars: false,
+              dataHasErrorBars: true,
+              stackedGraph: true
             }
           );
     </script>

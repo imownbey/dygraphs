@@ -106,6 +106,7 @@ DateGraph.prototype.__init__ = function(div, file, labels, attrs) {
   this.width_ = parseInt(div.style.width, 10);
   this.height_ = parseInt(div.style.height, 10);
   this.errorBars_ = attrs.errorBars || false;
+  this.dataHasErrorBars_ = attrs.dataHasErrorBars || this.errorBars_;
   this.stackedGraph_ = attrs.stackedGraph || false;
   this.fractions_ = attrs.fractions || false;
   this.strokeWidth_ = attrs.strokeWidth || DateGraph.DEFAULT_STROKE_WIDTH;
@@ -150,6 +151,7 @@ DateGraph.prototype.__init__ = function(div, file, labels, attrs) {
 
   // Create the PlotKit grapher
   this.layoutOptions_ = { 'errorBars': (this.errorBars_ || this.customBars_),
+                          'dataHasErrorBars': this.dataHasErrorBars_,
                           'stackedGraph': this.stackedGraph_,
                           'xOriginIsZero': false,
                           'yTickPrecision': 5 };
@@ -869,7 +871,7 @@ DateGraph.prototype.drawGraph_ = function(data) {
     series = this.rollingAverage(series, this.rollPeriod_);
 
     // Prune down to the desired range, if necessary (for zooming)
-    var bars = this.errorBars_ || this.customBars_;
+    var bars = this.dataHasErrorBars_;
     if (this.dateWindow_) {
       var low = this.dateWindow_[0];
       var high= this.dateWindow_[1];
@@ -891,29 +893,64 @@ DateGraph.prototype.drawGraph_ = function(data) {
       }
     }
 
-    if (bars) {
+    if (bars || this.stackedGraph_) {
+      // If it is either of these we need to run through the series
+      var vals = [];
+      for (var j=0; j<series.length; j++) {
+        var y;
+        if (bars) {
+          y = series[j][1][0];
+        } else {
+          y = series[j][1];
+        }
+        if (this.stackedGraph_) {
+          if (sums[series[j][0]] === undefined) {
+            sums[series[j][0]] = 0;
+          }
+          y += sums[series[j][0]];
+          if (maxY == null || y > maxY) 
+            maxY = y;
+
+          sums[series[j][0]] += y;
+        }
+        if (bars) {
+          vals[j] = [series[j][0],
+                     y, series[j][1][1], series[j][1][2]];
+        } else {
+          vals[j] = [series[j][0], y];
+        }
+      }
+      if (this.stackedGraph_) {
+        datasets.push([this.labels_[i - 1], vals]);
+      } else {
+        this.layout_.addDataset(this.labels_[i - 1], vals);
+      }
+    } else {
+      this.layout_.addDataset(this.labels_[i - 1], series);
+    }
+    /*
+      if (this.stackedGraph_) {
+        if (sums[series[j][0]] === undefined) 
+          sums[series[j][0]] = 0;
+        y = series[j][1] + sums[series[j][0]];
+        vals[j] = [series[j][0], (y)];
+        if (maxY == null || y > maxY) maxY = y;
+        sums[series[j][0]] = sums[series[j][0]] + series[j][1];
+      }
+
+      datasets.push([this.labels_[i - 1], vals]);
+    } else if (bars) {
+      console.log("Bars");
       var vals = [];
       for (var j=0; j<series.length; j++)
         vals[j] = [series[j][0],
                    series[j][1][0], series[j][1][1], series[j][1][2]];
       this.layout_.addDataset(this.labels_[i - 1], vals);
     } else {
-      if (this.stackedGraph_) {
-        var vals = [];
-        for (var j=0; j<series.length; j++) {
-          if (sums[series[j][0]] === undefined) 
-            sums[series[j][0]] = 0;
-          y = series[j][1] + sums[series[j][0]];
-          vals[j] = [series[j][0], (y)];
-          if (maxY == null || y > maxY) maxY = y;
-          sums[series[j][0]] = sums[series[j][0]] + series[j][1];
-        }
-
-        datasets.push([this.labels_[i - 1], vals]);
-      } else {
         this.layout_.addDataset(this.labels_[i - 1], series);
       }
     }
+    */
   }
   if (datasets.length != 0) {
     if(!this.colorsChanged_) {
@@ -1030,7 +1067,7 @@ DateGraph.prototype.rollingAverage = function(originalData, rollPeriod) {
     // Calculate the rolling average for the first rollPeriod - 1 points where
     // there is not enough data to roll over the full number of days
     var num_init_points = Math.min(rollPeriod - 1, originalData.length - 2);
-    if (!this.errorBars_){
+    if (!this.dataHasErrorBars_){
       for (var i = 0; i < num_init_points; i++) {
         var sum = 0;
         for (var j = 0; j < i + 1; j++)
@@ -1145,11 +1182,12 @@ DateGraph.prototype.parseCSV_ = function(data) {
         var vals = inFields[j].split("/");
         fields[j] = [parseFloat(vals[0]), parseFloat(vals[1])];
       }
-    } else if (this.errorBars_) {
+    } else if (this.dataHasErrorBars_) {
       // If there are error bars, values are (value, stddev) pairs
-      for (var j = 1; j < inFields.length; j += 2)
-        fields[(j + 1) / 2] = [parseFloat(inFields[j]),
-                               parseFloat(inFields[j + 1])];
+      for (var j = 1; j < inFields.length; j += 2) {
+       fields[(j + 1) / 2] = [parseFloat(inFields[j]),
+                             parseFloat(inFields[j + 1])];
+      }
     } else if (this.customBars_) {
       // Bars are a low;center;high tuple
       for (var j = 1; j < inFields.length; j++) {
@@ -1257,9 +1295,7 @@ DateGraph.prototype.start_ = function() {
  * @param {Object} attrs The new properties and values
  */
 DateGraph.prototype.updateOptions = function(attrs) {
-  if (attrs.errorBars) {
-    this.errorBars_ = attrs.errorBars;
-  }
+  this.errorBars_ = attrs.errorBars || false;
  
   var old_stacked = this.stackedGraph_;
 

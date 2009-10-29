@@ -27,7 +27,7 @@ DateGraphLayout.prototype = new PlotKit.Layout();
  */
 DateGraphLayout.prototype.evaluateWithError = function() {
   this.evaluate();
-  if (!this.options.errorBars) return;
+  if (!this.options.dataHasErrorBars) return;
 
   // Copy over the error terms
   var i = 0; // index in this.points
@@ -229,16 +229,19 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
         }
       };
       // should be same color as the lines
-      var err_color = color.colorWithAlpha(0.15);
-      ctx.fillStyle = err_color.toRGBString();
-      ctx.beginPath();
-      MochiKit.Iter.forEach(this.layout.points, partial(errorTrapezoid, ctx), this);
-      ctx.fill();
+      if (errorBars) {
+        var err_color = color.colorWithAlpha(0.15);
+        ctx.fillStyle = err_color.toRGBString();
+        ctx.beginPath();
+        MochiKit.Iter.forEach(this.layout.points, partial(errorTrapezoid, ctx), this);
+        ctx.fill();
+      }
     }
   };
 
-  if (errorBars)
+  if (this.layout.options.dataHasErrorBars) {
     bind(makeErrorBars, this)(context);
+  }
   bind(makePath, this)(context);
   context.restore();
 };

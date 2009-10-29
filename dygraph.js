@@ -907,11 +907,11 @@ DateGraph.prototype.drawGraph_ = function(data) {
           if (sums[series[j][0]] === undefined) {
             sums[series[j][0]] = 0;
           }
+          var old_y = y;
           y += sums[series[j][0]];
+          sums[series[j][0]] += old_y;
           if (maxY == null || y > maxY) 
             maxY = y;
-
-          sums[series[j][0]] += y;
         }
         if (bars) {
           vals[j] = [series[j][0],

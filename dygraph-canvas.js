@@ -182,7 +182,10 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
           first_point = false;
         }
       };
-      MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
+      for(var x = 0; x < this.layout.points.length; x++) {
+        addPoint(ctx, this.layout.points[x]);
+      }
+      //MochiKit.Iter.forEach(this.layout.points, partial(addPoint, ctx), this);
       if (this.layout.options.shouldFill) {
         ctx.lineTo(this.area.x + this.area.w, this.area.y + this.area.h);
         ctx.closePath();
@@ -196,6 +199,7 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
   };
 
   var makeErrorBars = function(ctx) {
+    console.log("Called");
     for (var i = 0; i < setCount; i++) {
       var setName = setNames[i];
       var color = colorScheme[i % colorCount];
@@ -229,17 +233,16 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
         }
       };
       // should be same color as the lines
-      if (errorBars) {
-        var err_color = color.colorWithAlpha(0.15);
-        ctx.fillStyle = err_color.toRGBString();
-        ctx.beginPath();
-        MochiKit.Iter.forEach(this.layout.points, partial(errorTrapezoid, ctx), this);
-        ctx.fill();
-      }
+      var err_color = color.colorWithAlpha(0.15);
+      ctx.fillStyle = err_color.toRGBString();
+      ctx.beginPath();
+      MochiKit.Iter.forEach(this.layout.points, partial(errorTrapezoid, ctx), this);
+      ctx.fill();
     }
   };
 
-  if (this.layout.options.dataHasErrorBars) {
+  if (errorBars) {
+    console.log("Error bars?");
     bind(makeErrorBars, this)(context);
   }
   bind(makePath, this)(context);

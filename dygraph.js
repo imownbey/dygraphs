@@ -630,7 +630,8 @@ DateGraph.prototype.round_ = function(num, places) {
 DateGraph.prototype.loadedEvent_ = function(data) {
   if (typeof(jQuery) != "undefined")
     jQuery(document).trigger('graph.loaded');
-  this.rawData_ = this.parseCSV_(data);
+  if(!this.rawData_)
+    this.rawData_ = this.parseCSV_(data);
   this.drawGraph_(this.rawData_);
 };
 
@@ -1275,9 +1276,7 @@ DateGraph.prototype.start_ = function() {
     var caller = this;
     req.onreadystatechange = function () {
       if (req.readyState == 4) {
-        if (req.status == 200) {
-          caller.loadedEvent_(req.responseText);
-        }
+        caller.loadedEvent_(req.responseText);
       }
     };
 

@@ -4723,7 +4723,9 @@ _34.lineTo(_31.canvasx,_31.canvasy);
 _32=false;
 }
 };
-MochiKit.Iter.forEach(this.layout.points,_24(_33,ctx),this);
+for(var x=0;x<this.layout.points.length;x++){
+_33(ctx,this.layout.points[x]);
+}
 if(this.layout.options.shouldFill){
 ctx.lineTo(this.area.x+this.area.w,this.area.y+this.area.h);
 ctx.closePath();
@@ -4736,6 +4738,7 @@ ctx.fill();
 }
 };
 var _35=function(ctx){
+console.log("Called");
 for(var i=0;i<_22;i++){
 var _36=_20[i];
 var _37=_19[i%_18];
@@ -4765,16 +4768,15 @@ _40[1]=_46[1];
 _39=_45.canvasx;
 }
 };
-if(_21){
 var _47=_37.colorWithAlpha(0.15);
 ctx.fillStyle=_47.toRGBString();
 ctx.beginPath();
 MochiKit.Iter.forEach(this.layout.points,_24(_43,ctx),this);
 ctx.fill();
 }
-}
 };
-if(this.layout.options.dataHasErrorBars){
+if(_21){
+console.log("Error bars?");
 _23(_35,this)(_17);
 }
 _23(_27,this)(_17);
@@ -5131,7 +5133,9 @@ DateGraph.prototype.loadedEvent_=function(data){
 if(typeof (jQuery)!="undefined"){
 jQuery(document).trigger("graph.loaded");
 }
+if(!this.rawData_){
 this.rawData_=this.parseCSV_(data);
+}
 this.drawGraph_(this.rawData_);
 };
 DateGraph.prototype.months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -5618,9 +5622,7 @@ var req=new XMLHttpRequest();
 var _209=this;
 req.onreadystatechange=function(){
 if(req.readyState==4){
-if(req.status==200){
 _209.loadedEvent_(req.responseText);
-}
 }
 };
 req.open("GET",this.file_,true);

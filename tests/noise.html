@@ -18,6 +18,8 @@
     <div id="g-no" style="width:600px; height:300px;"></div>
     <p>14-day rollup with errorbars turned off stacked:</p>
     <div id="g-stacked" style="width:600px; height:300px;"></div>
+    <p>No Width:</p>
+    <div id="g-width" style="height:300px;"></div>
 
     <script type="text/javascript">
       g = new DateGraph(
@@ -44,6 +46,15 @@
           );
       gstacked = new DateGraph(
             document.getElementById("g-stacked"),
+            NoisyData, null, {
+              rollPeriod: 14,
+              errorBars: false,
+              dataHasErrorBars: true,
+              stackedGraph: true
+            }
+          );
+      gwidth = new DateGraph(
+            document.getElementById("g-width"),
             NoisyData, null, {
               rollPeriod: 14,
               errorBars: false,

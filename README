@@ -17,6 +17,7 @@ Features new to this fork
               find the width of the containing div on load (will not resize though)
 - Correct drawing order: will draw the dots over the lines, this can look weird in some
                          situations but is generally more useful.
+- Optimizations: General optimizations to speed things up significantly
 
 Features
 - Plots time series without using an external server or Flash

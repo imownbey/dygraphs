@@ -4814,7 +4814,7 @@ this.stackedGraph_=_54.stackedGraph||false;
 this.fractions_=_54.fractions||false;
 this.strokeWidth_=_54.strokeWidth||DateGraph.DEFAULT_STROKE_WIDTH;
 this.dateWindow_=_54.dateWindow||null;
-this.highlightClosestPoint_=true;
+this.highlightClosestPoint_=_54.highlightClosestPoint||false;
 this.valueRange_=_54.valueRange||null;
 this.labelsSeparateLines=_54.labelsSeparateLines||false;
 this.labelsDiv_=_54.labelsDiv||null;
@@ -5085,7 +5085,7 @@ _117+="<br/>";
 }
 var _119=_112[i];
 if(_119==_113){
-_117+="<span class='highlight' style='background-color: red;'>";
+_117+="<span class='highlight'>";
 }
 _117+=" <b><font color='"+this.colors_[i%clen].toHexString()+"'>"+_119.name+"</font></b>:"+this.round_(_119.yval,5);
 if(_119==_113){

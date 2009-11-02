@@ -333,7 +333,7 @@ DateGraph.prototype.createDragInterface_ = function() {
   var getY = function(e) { return e.mouse().page.y - py };
 
   // Draw zoom rectangles when the mouse is down and the user moves around
-  connect(this.hidden_, 'onmousemove', function(event) {
+  connect(this.canvas_, 'onmousemove', function(event) {
     if (mouseDown) {
       dragEndX = getX(event);
       dragEndY = getY(event);
@@ -344,7 +344,7 @@ DateGraph.prototype.createDragInterface_ = function() {
   });
 
   // Track the beginning of drag events
-  connect(this.hidden_, 'onmousedown', function(event) {
+  connect(this.canvas_, 'onmousedown', function(event) {
     mouseDown = true;
     px = PlotKit.Base.findPosX(self.canvas_);
     py = PlotKit.Base.findPosY(self.canvas_);
@@ -363,7 +363,7 @@ DateGraph.prototype.createDragInterface_ = function() {
   });
 
   // Temporarily cancel the dragging event when the mouse leaves the graph
-  connect(this.hidden_, 'onmouseout', this, function(event) {
+  connect(this.canvas_, 'onmouseout', this, function(event) {
     if (mouseDown) {
       dragEndX = null;
       dragEndY = null;
@@ -372,7 +372,7 @@ DateGraph.prototype.createDragInterface_ = function() {
 
   // If the mouse is released on the canvas during a drag event, then it's a
   // zoom. Only do the zoom if it's over a large enough area (>= 10 pixels)
-  connect(this.hidden_, 'onmouseup', this, function(event) {
+  connect(this.canvas_, 'onmouseup', this, function(event) {
     if (mouseDown) {
       mouseDown = false;
       dragEndX = getX(event);
@@ -401,7 +401,7 @@ DateGraph.prototype.createDragInterface_ = function() {
   });
 
   // Double-clicking zooms back out
-  connect(this.hidden_, 'ondblclick', this, function(event) {
+  connect(this.canvas_, 'ondblclick', this, function(event) {
     self.dateWindow_ = null;
     self.drawGraph_(self.rawData_);
     var minDate = self.rawData_[0][0];

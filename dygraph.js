@@ -111,7 +111,7 @@ DateGraph.prototype.__init__ = function(div, file, labels, attrs) {
   this.fractions_ = attrs.fractions || false;
   this.strokeWidth_ = attrs.strokeWidth || DateGraph.DEFAULT_STROKE_WIDTH;
   this.dateWindow_ = attrs.dateWindow || null;
-  this.highlightClosestPoint_ = true;
+  this.highlightClosestPoint_ = attrs.highlightClosestPoint || false;
   this.valueRange_ = attrs.valueRange || null;
   this.labelsSeparateLines = attrs.labelsSeparateLines || false;
   this.labelsDiv_ = attrs.labelsDiv || null;
@@ -543,7 +543,7 @@ DateGraph.prototype.mouseMove_ = function(event) {
       }
       var point = selPoints[i];
       if(point == closestPoint) {
-        replace += "<span class='highlight' style='background-color: red;'>";
+        replace += "<span class='highlight'>";
       }
       replace += " <b><font color='" + this.colors_[i%clen].toHexString() + "'>"
               + point.name + "</font></b>:"

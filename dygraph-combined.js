@@ -4937,7 +4937,7 @@ return e.mouse().page.x-px;
 var _83=function(e){
 return e.mouse().page.y-py;
 };
-connect(this.hidden_,"onmousemove",function(_84){
+connect(this.canvas_,"onmousemove",function(_84){
 if(_74){
 _77=_82(_84);
 _78=_83(_84);
@@ -4945,7 +4945,7 @@ _73.drawZoomRect_(_75,_77,_79);
 _79=_77;
 }
 });
-connect(this.hidden_,"onmousedown",function(_85){
+connect(this.canvas_,"onmousedown",function(_85){
 _74=true;
 px=PlotKit.Base.findPosX(_73.canvas_);
 py=PlotKit.Base.findPosY(_73.canvas_);
@@ -4959,13 +4959,13 @@ _75=null;
 _76=null;
 }
 });
-connect(this.hidden_,"onmouseout",this,function(_87){
+connect(this.canvas_,"onmouseout",this,function(_87){
 if(_74){
 _77=null;
 _78=null;
 }
 });
-connect(this.hidden_,"onmouseup",this,function(_88){
+connect(this.canvas_,"onmouseup",this,function(_88){
 if(_74){
 _74=false;
 _77=_82(_88);
@@ -4984,7 +4984,7 @@ _75=null;
 _76=null;
 }
 });
-connect(this.hidden_,"ondblclick",this,function(_91){
+connect(this.canvas_,"ondblclick",this,function(_91){
 _73.dateWindow_=null;
 _73.drawGraph_(_73.rawData_);
 var _92=_73.rawData_[0][0];

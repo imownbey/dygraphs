@@ -199,7 +199,6 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
   };
 
   var makeErrorBars = function(ctx) {
-    console.log("Called");
     for (var i = 0; i < setCount; i++) {
       var setName = setNames[i];
       var color = colorScheme[i % colorCount];

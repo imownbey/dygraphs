@@ -111,6 +111,7 @@ DateGraph.prototype.__init__ = function(div, file, labels, attrs) {
   this.fractions_ = attrs.fractions || false;
   this.strokeWidth_ = attrs.strokeWidth || DateGraph.DEFAULT_STROKE_WIDTH;
   this.dateWindow_ = attrs.dateWindow || null;
+  this.highlightClosestPoint_ = true;
   this.valueRange_ = attrs.valueRange || null;
   this.labelsSeparateLines = attrs.labelsSeparateLines || false;
   this.labelsDiv_ = attrs.labelsDiv || null;
@@ -202,14 +203,14 @@ DateGraph.prototype.createInterface_ = function() {
 
   // Create the canvas to store
   var canvas = MochiKit.DOM.CANVAS;
-  this.canvas_ = canvas( { style: { 'position': 'absolute' },
+  this.canvas_ = canvas( { style: { 'position': 'absolute'},
                           width: this.width_,
                           height: this.height_});
   appendChildNodes(this.graphDiv, this.canvas_);
 
   this.hidden_ = this.createPlotKitCanvas_(this.canvas_);
-  connect(this.hidden_, 'onmousemove', this, function(e) { this.mouseMove_(e) });
-  connect(this.hidden_, 'onmouseout', this, function(e) { this.mouseOut_(e) });
+  connect(this.canvas_, 'onmousemove', this, function(e) { this.mouseMove_(e) });
+  connect(this.canvas_, 'onmouseout', this, function(e) { this.mouseOut_(e) });
 }
 
 /**
@@ -226,7 +227,7 @@ DateGraph.prototype.createPlotKitCanvas_ = function(canvas) {
   h.style.left = canvas.style.left;
   h.width = this.width_;
   h.height = this.height_;
-  MochiKit.DOM.appendChildNodes(this.graphDiv, h);
+  MochiKit.DOM.insertSiblingNodesBefore(canvas, h);
   return h;
 };
 
@@ -480,6 +481,7 @@ DateGraph.prototype.doZoom_ = function(lowX, highX) {
  */
 DateGraph.prototype.mouseMove_ = function(event) {
   var canvasx = event.mouse().page.x - PlotKit.Base.findPosX(this.hidden_);
+  var canvasy = event.mouse().page.y - PlotKit.Base.findPosY(this.hidden_);
   var points = this.layout_.points;
 
   var lastx = -1;
@@ -487,12 +489,12 @@ DateGraph.prototype.mouseMove_ = function(event) {
 
   // Loop through all the points and find the date nearest to our current
   // location.
-  var minDist = 1e+100;
+  var xminDist = 1e+100;
   var idx = -1;
   for (var i = 0; i < points.length; i++) {
-    var dist = Math.abs(points[i].canvasx - canvasx);
-    if (dist > minDist) break;
-    minDist = dist;
+    var xdist = Math.abs(points[i].canvasx - canvasx);
+    if (xdist > xminDist) break;
+    xminDist = xdist;
     idx = i;
   }
   if (idx >= 0) lastx = points[idx].xval;
@@ -508,12 +510,25 @@ DateGraph.prototype.mouseMove_ = function(event) {
     }
   }
 
+  var closestPoint = false;
+  var yminDist = 1e+100;
+  // Find the closest point
+  if (this.highlightClosestPoint_) {
+    for(var x = 0; x < selPoints.length; x++) {
+      var ydist = Math.abs(selPoints[x].canvasy - canvasy);
+      if (ydist < yminDist) {
+        yminDist = ydist;
+        closestPoint = selPoints[x];
+      }
+    }
+  }
+
   // Clear the previously drawn vertical, if there is one
   var circleSize = this.attrs_.highlightCircleSize;
   var ctx = this.canvas_.getContext("2d");
   if (this.previousVerticalX_ >= 0) {
     var px = this.previousVerticalX_;
-    ctx.clearRect(px - circleSize - 1, 0, 2 * circleSize + 2, this.height_);
+    ctx.clearRect(px - circleSize - 2, 0, 2 * circleSize + 5, this.height_);
   }
 
   if (selPoints.length > 0) {
@@ -527,9 +542,15 @@ DateGraph.prototype.mouseMove_ = function(event) {
         replace += "<br/>";
       }
       var point = selPoints[i];
+      if(point == closestPoint) {
+        replace += "<span class='highlight' style='background-color: red;'>";
+      }
       replace += " <b><font color='" + this.colors_[i%clen].toHexString() + "'>"
               + point.name + "</font></b>:"
               + this.round_(point.yval, 5);
+      if(point == closestPoint) {
+        replace += "</span>";
+      }
     }
     this.labelsDiv_.innerHTML = replace;
 
@@ -537,8 +558,14 @@ DateGraph.prototype.mouseMove_ = function(event) {
     this.lastx_ = lastx;
 
     // Draw colored circles over the center of each selected point
-    ctx.save()
+    ctx.save();
     for (var i = 0; i < selPoints.length; i++) {
+      if(selPoints[i] == closestPoint) {
+        ctx.beginPath();
+        ctx.fillStyle = "rgb(255, 0, 0)";
+        ctx.arc(canvasx, selPoints[i%clen].canvasy, circleSize + 2, 0, 360, false);
+        ctx.fill();
+      }
       ctx.beginPath();
       ctx.fillStyle = this.colors_[i%clen].toRGBString();
       ctx.arc(canvasx, selPoints[i%clen].canvasy, circleSize, 0, 360, false);

@@ -4,6 +4,20 @@ http://code.google.com/p/dygraphs/
 
 The dygraphs JavaScript library produces produces interactive, zoomable charts of time series based on CSV files.
 
+Features new to this fork
+- Option: dataHasErrorBars -- For when the data has error bars but
+          you dont necessarily want to draw them (or you want to toggle them)
+- Option: shouldFill -- Works the same as plotkits shouldFill (makes an area graph)
+- Option: stackedGraph -- Creates a stacked graph. Sets shouldFill 
+          to true unless otherwise stated
+- Option: highlightClosestPoint -- This will draw a red halo around the cloest
+          point, and surround the associated label with the tag:
+          <span class="highlight">LABEL</span>
+- Auto-width: You no longer need to explicitly set the width, it will automatically
+              find the width of the containing div on load (will not resize though)
+- Correct drawing order: will draw the dots over the lines, this can look weird in some
+                         situations but is generally more useful.
+
 Features
 - Plots time series without using an external server or Flash
 - Supports multiple data series
@@ -19,28 +33,6 @@ Caveats
 
 Demo
 For a gallery and documentation, see http://danvk.org/dygraphs/
-
-Minimal Example
-<html>
-<head>
-<script type="text/javascript" src="dygraph-combined.js"></script>
-</head>
-<body>
-<div id="graphdiv" style="width:400px; height:300px;"></div>
-<script type="text/javascript">
-  g = new DateGraph(
-        document.getElementById("graphdiv"),  // containing div
-        function() {                // function or path to CSV file.
-          return "20080507,75\n" +
-                 "20080508,70\n" +
-                 "20080509,80\n";
-        },
-        [ "Temperature" ],          // names of data series
-        {}                          // additional options (see wiki)
-      );
-</script>
-</body>
-</html>
 
 License(s)
 dygraphs uses:

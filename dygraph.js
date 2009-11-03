@@ -916,7 +916,7 @@ DateGraph.prototype.drawGraph_ = function(data) {
       for (var j = 0; j < series.length; j++) {
         var y = bars ? series[j][1][0] : series[j][1];
         if (maxY == null || y > maxY) {
-          maxY = bars ? y + series[j][1][1] : y;
+          maxY = this.errorBars_ ? y + series[j][1][1] : y;
         }
       }
     }

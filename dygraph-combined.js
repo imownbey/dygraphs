@@ -5364,7 +5364,7 @@ _175=_179;
 for(var j=0;j<_175.length;j++){
 var y=bars?_175[j][1][0]:_175[j][1];
 if(maxY==null||y>maxY){
-maxY=bars?y+_175[j][1][1]:y;
+maxY=this.errorBars_?y+_175[j][1][1]:y;
 }
 }
 }

@@ -37,13 +37,13 @@ DateGraphLayout.prototype.evaluateWithError = function() {
     if (PlotKit.Base.isFuncLike(dataset)) continue;
     for (var j = 0; j < dataset.length; j++, i++) {
       var item = dataset[j];
-      var xv = parseFloat(item[0]);
-      var yv = parseFloat(item[1]);
+      var xv = item[0];
+      var yv = item[1];
 
       if (xv == this.points[i].xval &&
           yv == this.points[i].yval) {
-        this.points[i].errorMinus = parseFloat(item[2]);
-        this.points[i].errorPlus = parseFloat(item[3]);
+        this.points[i].errorMinus = item[2];
+        this.points[i].errorPlus = item[3];
       }
     }
   }
@@ -146,12 +146,14 @@ DateGraphCanvasRenderer.prototype._renderLineChart = function() {
   var partial = MochiKit.Base.partial;
 
   //Update Points
-  var updatePoint = function(point) {
-    point.canvasx = this.area.w * point.x + this.area.x;
-    point.canvasy = this.area.h * point.y + this.area.y;
+  var updatePoint = function(point, self) {
+    point.canvasx = self.area.w * point.x + self.area.x;
+    point.canvasy = self.area.h * point.y + self.area.y;
   }
 
-  MochiKit.Iter.forEach(this.layout.points, updatePoint, this);
+  for(var i = 0; i < this.layout.points.length; i++) {
+    updatePoint(this.layout.points[i], this);
+  }
   // create paths
   var makePath = function(ctx) {
     for (var i = 0; i < setCount; i++) {

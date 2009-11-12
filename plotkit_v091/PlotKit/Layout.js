@@ -227,14 +227,13 @@ PlotKit.Layout.prototype._evaluateLineCharts = function() {
     for (var setName in this.datasets) {
         var dataset = this.datasets[setName];
         if (PlotKit.Base.isFuncLike(dataset)) continue;
-        dataset.sort(function(a, b) { return compare(parseFloat(a[0]), parseFloat(b[0])); });
         for (var j = 0; j < dataset.length; j++) {
             var item = dataset[j];
             var point = {
-                x: ((parseFloat(item[0]) - this.minxval) * this.xscale),
-                y: 1.0 - ((parseFloat(item[1]) - this.minyval) * this.yscale),
-                xval: parseFloat(item[0]),
-                yval: parseFloat(item[1]),
+                x: ((item[0] - this.minxval) * this.xscale),
+                y: 1.0 - ((item[1] - this.minyval) * this.yscale),
+                xval: item[0],
+                yval: item[1],
                 name: setName
             };
 
